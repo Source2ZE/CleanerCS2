@@ -127,6 +127,9 @@ void LoadConfig()
 			if (line[0] == '/' && line[1] == '/')
 				continue;
 
+			if (line.empty())
+				continue;
+
 			// allow CRLF on linux
 			line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
 
@@ -184,6 +187,11 @@ bool CleanerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 
 bool CleanerPlugin::Unload(char *error, size_t maxlen)
 {
+	for (auto& regex : g_RegexList)
+		delete regex;
+
+	g_RegexList.clear();
+
 	if (g_pHook)
 	{
 		funchook_uninstall(g_pHook, 0);
