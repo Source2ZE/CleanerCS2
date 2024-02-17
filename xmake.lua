@@ -9,9 +9,12 @@ target("CleanerCS2-Xmake")
     set_kind("shared")
     add_files("src/*.cpp")
     add_packages("re2")
+    add_cflags("-fvisibility=hidden")
+    add_cxxflags("-fvisibility-inlines-hidden")
 
     add_files({
-        SDK_PATH.."/tier1/convar.cpp"
+        SDK_PATH.."/tier1/convar.cpp",
+        SDK_PATH.."/public/tier0/memoverride.cpp",
     })
 
     if is_plat("windows") then
@@ -87,7 +90,8 @@ target("CleanerCS2-Xmake")
             "GNUC",
             "COMPILER_GCC",
             "PLATFORM_64BITS",
-            "META_IS_SOURCE2"
+            "META_IS_SOURCE2",
+            "_GLIBCXX_USE_CXX11_ABI=0"
         })
     end
     set_languages("cxx20")

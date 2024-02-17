@@ -238,7 +238,7 @@ const char *CleanerPlugin::GetLicense()
 
 const char *CleanerPlugin::GetVersion()
 {
-	return "1.0.0";
+	return "1.0.1";
 }
 
 const char *CleanerPlugin::GetDate()
@@ -248,17 +248,17 @@ const char *CleanerPlugin::GetDate()
 
 const char *CleanerPlugin::GetLogTag()
 {
-	return "SAMPLE";
+	return "CLEANER";
 }
 
 const char *CleanerPlugin::GetAuthor()
 {
-	return "AlliedModders LLC";
+	return "Poggu";
 }
 
 const char *CleanerPlugin::GetDescription()
 {
-	return "Sample basic plugin";
+	return "Console regex filter";
 }
 
 const char *CleanerPlugin::GetName()
