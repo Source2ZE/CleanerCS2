@@ -18,6 +18,10 @@ Supports both Windows and Linux.
 2. Extract the contents of the archive to your server's `addons` directory
 3. Edit the `addons/cleanercs2/config.cfg` file to your liking (see the example config above)
 
+## Commands
+
+- `conclear_reload` - Reloads the configuration file
+
 ## Building from source
 
 [Xmake](https://xmake.io/#/getting_started) is used to build the project.
