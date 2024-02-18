@@ -9,8 +9,7 @@ target("CleanerCS2-Xmake")
     set_kind("shared")
     add_files("src/*.cpp")
     add_packages("re2")
-    add_cflags("-fvisibility=hidden")
-    add_cxxflags("-fvisibility-inlines-hidden")
+    set_symbols("hidden")
 
     add_files({
         SDK_PATH.."/tier1/convar.cpp",
