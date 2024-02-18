@@ -90,7 +90,7 @@ target("CleanerCS2-Xmake")
             "COMPILER_GCC",
             "PLATFORM_64BITS",
             "META_IS_SOURCE2",
-            "_GLIBCXX_USE_CXX11_ABI=0"
+            "_GLIBCXX_USE_CXX11_ABI=1"
         })
     end
-    set_languages("cxx20")
+    set_languages("cxx17")
