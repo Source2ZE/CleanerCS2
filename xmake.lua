@@ -74,6 +74,7 @@ target("CleanerCS2-Xmake")
         add_defines({
             "COMPILER_MSVC",
             "COMPILER_MSVC64",
+            "PLATFORM_64BITS",
             "WIN32",
             "WINDOWS",
             "CRT_SECURE_NO_WARNINGS",
