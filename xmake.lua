@@ -92,6 +92,7 @@ target("CleanerCS2-Xmake")
             "COMPILER_GCC",
             "PLATFORM_64BITS",
             "META_IS_SOURCE2",
+            "TIER0_DLL_EXPORT",
             "_GLIBCXX_USE_CXX11_ABI=1"
         })
     end
