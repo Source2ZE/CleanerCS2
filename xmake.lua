@@ -1,3 +1,4 @@
+set_runtimes("MT")
 add_rules("mode.debug", "mode.release")
 add_requires("re2")
 
@@ -92,7 +93,11 @@ target("CleanerCS2-Xmake")
             "COMPILER_GCC",
             "PLATFORM_64BITS",
             "META_IS_SOURCE2",
-            "_GLIBCXX_USE_CXX11_ABI=1"
+            "_GLIBCXX_USE_CXX11_ABI=1",
+            "stricmp=strcasecmp",
+            "_stricmp=strcasecmp",
+            "_snprintf=snprintf",
+            "_vsnprintf=vsnprintf"
         })
     end
     set_languages("cxx17")
