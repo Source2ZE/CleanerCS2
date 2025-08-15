@@ -238,7 +238,7 @@ const char *CleanerPlugin::GetLicense()
 
 const char *CleanerPlugin::GetVersion()
 {
-	return "1.0.4";
+	return "1.0.5";
 }
 
 const char *CleanerPlugin::GetDate()
