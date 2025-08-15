@@ -46,13 +46,13 @@ IVEngineServer *engine = NULL;
 IGameEventManager2 *gameevents = NULL;
 ICvar *icvar = NULL;
 
-typedef int (*LogDirect_t)(void* loggingSystem, int channel, int severity, LeafCodeInfo_t*, LoggingMetaData_t*, Color, char const*, va_list*);
+typedef int (*LogDirect_t)(void* loggingSystem, int channel, int severity, LeafCodeInfo_t*, char const*, va_list*);
 LogDirect_t g_pLogDirect = nullptr;
 funchook_t* g_pHook = nullptr;
 
 std::vector<re2::RE2*> g_RegexList;
 
-int Detour_LogDirect(void* loggingSystem, int channel, int severity, LeafCodeInfo_t* leafCode, LoggingMetaData_t* metaData, Color color, char const* str, va_list* args)
+int Detour_LogDirect(void* loggingSystem, int channel, int severity, LeafCodeInfo_t* leafCode, char const* str, va_list* args)
 {
 	char buffer[MAX_LOGGING_MESSAGE_LENGTH];
 
@@ -70,7 +70,7 @@ int Detour_LogDirect(void* loggingSystem, int channel, int severity, LeafCodeInf
 			return 0;
 	}
 
-	return g_pLogDirect(loggingSystem, channel, severity, leafCode, metaData, color, str, args);
+	return g_pLogDirect(loggingSystem, channel, severity, leafCode, str, args);
 }
 
 bool SetupHook()
@@ -81,7 +81,7 @@ bool SetupHook()
 #ifdef WIN32
 	const byte sig[] = "\x4C\x89\x4C\x24\x2A\x44\x89\x44\x24\x2A\x89\x54\x24\x2A\x55";
 #else
-	const byte sig[] = "\x55\x49\x89\xFA\x31\xC0";
+	const byte sig[] = "\x55\x49\x89\xFA\x48\x89\xE5\x41\x57\x41\x56\x41\x89\xD6";
 #endif
 	g_pLogDirect = (LogDirect_t)serverModule->FindSignature((byte*)sig, sizeof(sig) - 1, err);
 
