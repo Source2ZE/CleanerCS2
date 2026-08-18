@@ -54,9 +54,13 @@ funchook_t* g_pHook = nullptr;
 
 std::vector<re2::RE2*> g_RegexList;
 std::shared_mutex g_RegexMutex;
+thread_local bool g_BypassFilter = false;
 
 int Detour_LogDirect(void* loggingSystem, int channel, int severity, LeafCodeInfo_t* leafCode, char const* str, va_list* args)
 {
+	if (g_BypassFilter)
+		return g_pLogDirect(loggingSystem, channel, severity, leafCode, str, args);
+
 	char buffer[MAX_LOGGING_MESSAGE_LENGTH];
 
 	if (args)
@@ -160,7 +164,9 @@ void LoadConfig()
 			if (line[0] == '/' && line[1] == '/')
 				continue;
 
+			g_BypassFilter = true;
 			META_CONPRINTF("Registering regex: %s\n", line.c_str());
+			g_BypassFilter = false;
 
 			RE2::Options options;
 			options.set_dot_nl(true);
@@ -277,7 +283,7 @@ const char *CleanerPlugin::GetLicense()
 
 const char *CleanerPlugin::GetVersion()
 {
-	return "1.0.9";
+	return "1.1";
 }
 
 const char *CleanerPlugin::GetDate()
