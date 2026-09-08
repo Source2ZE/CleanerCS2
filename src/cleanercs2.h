@@ -22,7 +22,6 @@
 
 #include <ISmmPlugin.h>
 #include <igameevents.h>
-#include <sh_vector.h>
 
 class CleanerPlugin : public ISmmPlugin, public IMetamodListener
 {

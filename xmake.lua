@@ -32,15 +32,6 @@ target("CleanerCS2-Xmake")
         })
     end
 
-    add_linkdirs({
-        "vendor/funchook/lib/Release",
-    })
-
-    add_links({
-        "funchook",
-        "distorm",
-    })
-
     if is_plat("windows") then
         add_links("psapi");
         add_files("src/utils/plat_win.cpp");
@@ -50,7 +41,6 @@ target("CleanerCS2-Xmake")
 
     add_includedirs({
         "src",
-        "vendor/funchook/include",
         -- sdk
         SDK_PATH,
         SDK_PATH.."/thirdparty/protobuf-3.21.8/src",
@@ -65,7 +55,7 @@ target("CleanerCS2-Xmake")
         SDK_PATH.."/public/entity2",
         -- metamod
         MM_PATH.."/core",
-        MM_PATH.."/core/sourcehook",
+        MM_PATH.."/third_party/khook/include",
     })
 
     if(is_plat("windows")) then
@@ -98,7 +88,7 @@ target("CleanerCS2-Xmake")
             "_vsnprintf=vsnprintf"
         })
     end
-    set_languages("cxx17")
+    set_languages("cxx20")
 
 xpack("CleanerCS2")
     set_formats("dir")

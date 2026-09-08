@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include "cleanercs2.h"
 #include <iserver.h>
-#include <funchook.h>
+#include "khook.hpp"
 #include "utils/module.h"
 #include <iostream>
 #include <fstream>
@@ -49,17 +49,15 @@ IGameEventManager2 *gameevents = NULL;
 ICvar *icvar = NULL;
 
 typedef int (*LogDirect_t)(void* loggingSystem, int channel, int severity, LeafCodeInfo_t*, char const*, va_list*);
-LogDirect_t g_pLogDirect = nullptr;
-funchook_t* g_pHook = nullptr;
 
 std::vector<re2::RE2*> g_RegexList;
 std::shared_mutex g_RegexMutex;
 thread_local bool g_BypassFilter = false;
 
-int Detour_LogDirect(void* loggingSystem, int channel, int severity, LeafCodeInfo_t* leafCode, char const* str, va_list* args)
+KHook::Return<int> Detour_LogDirect(void* loggingSystem, int channel, int severity, LeafCodeInfo_t* leafCode, char const* str, va_list* args)
 {
 	if (g_BypassFilter)
-		return g_pLogDirect(loggingSystem, channel, severity, leafCode, str, args);
+		return {KHook::Action::Ignore};
 
 	char buffer[MAX_LOGGING_MESSAGE_LENGTH];
 
@@ -76,58 +74,33 @@ int Detour_LogDirect(void* loggingSystem, int channel, int severity, LeafCodeInf
 		for (auto& regex : g_RegexList)
 		{
 			if (RE2::FullMatch(args ? buffer : str, *regex))
-				return 0;
+				return {KHook::Action::Supersede, 0};
 		}
 	}
 
-	return g_pLogDirect(loggingSystem, channel, severity, leafCode, str, args);
+	return {KHook::Action::Ignore};
 }
+
+KHook::Function<int, void*, int, int, LeafCodeInfo_t*, char const*, va_list*> logDirectHook(Detour_LogDirect, nullptr);
 
 bool SetupHook()
 {
-	CModule serverModule(ROOTBIN, "tier0");
+	CModule tier0Module(ROOTBIN, "tier0");
 
-	int err;
 #ifdef WIN32
-	const byte sig[] = "\x4C\x89\x4C\x24\x2A\x44\x89\x44\x24\x2A\x89\x54\x24\x2A\x55";
+	const char* sig = "4C 89 4C 24 ? 44 89 44 24 ? 89 54 24 ? 55";
 #else
-	const byte sig[] = "\x55\x89\xD0\x49\x89\xFA\x89\xF7\x48\x89\xE5";
+	const char* sig = "55 89 D0 49 89 FA 89 F7 48 89 E5";
 #endif
-	g_pLogDirect = (LogDirect_t)serverModule.FindSignature((byte*)sig, sizeof(sig) - 1, err);
+	LogDirect_t pLogDirect = reinterpret_cast<LogDirect_t>(KHook::LookupSignature(tier0Module.m_base, tier0Module.m_size, sig));
 
-	if (err)
+	if (!pLogDirect)
 	{
-		META_CONPRINTF("[CleanerCS2] Failed to find signature: %i\n", err);
+		META_CONPRINTF("[CleanerCS2] Failed to find LogDirect signature\n");
 		return false;
 	}
 
-	g_pHook = funchook_create();
-
-	if (!g_pHook)
-	{
-		META_CONPRINTF("[CleanerCS2] Failed to create hook\n");
-		return false;
-	}
-
-	int hookErr = funchook_prepare(g_pHook, (void**)&g_pLogDirect, (void*)Detour_LogDirect);
-
-	if (hookErr != FUNCHOOK_ERROR_SUCCESS)
-	{
-		META_CONPRINTF("[CleanerCS2] Failed to prepare hook: %s\n", funchook_error_message(g_pHook));
-		funchook_destroy(g_pHook);
-		g_pHook = nullptr;
-		return false;
-	}
-
-	hookErr = funchook_install(g_pHook, 0);
-
-	if (hookErr != FUNCHOOK_ERROR_SUCCESS)
-	{
-		META_CONPRINTF("[CleanerCS2] Failed to install hook: %s\n", funchook_error_message(g_pHook));
-		funchook_destroy(g_pHook);
-		g_pHook = nullptr;
-		return false;
-	}
+	logDirectHook.Configure(pLogDirect);
 
 	return true;
 }
@@ -230,13 +203,6 @@ bool CleanerPlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen,
 
 bool CleanerPlugin::Unload(char *error, size_t maxlen)
 {
-	if (g_pHook)
-	{
-		funchook_uninstall(g_pHook, 0);
-		funchook_destroy(g_pHook);
-		g_pHook = nullptr;
-	}
-
 	std::unique_lock<std::shared_mutex> lock(g_RegexMutex);
 
 	for (auto& regex : g_RegexList)
@@ -283,7 +249,7 @@ const char *CleanerPlugin::GetLicense()
 
 const char *CleanerPlugin::GetVersion()
 {
-	return "1.1";
+	return "2.0";
 }
 
 const char *CleanerPlugin::GetDate()
