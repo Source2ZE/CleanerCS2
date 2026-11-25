@@ -14,7 +14,7 @@ target("CleanerCS2-Xmake")
     set_symbols("hidden")
 
     add_files({
-        SDK_PATH.."/tier1/convar.cpp",
+        SDK_PATH.."/tier0_perproject/convar.cpp",
         SDK_PATH.."/public/tier0/memoverride.cpp",
     })
 

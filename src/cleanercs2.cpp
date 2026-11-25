@@ -19,7 +19,9 @@
 
 #include <stdio.h>
 #include "cleanercs2.h"
-#include <iserver.h>
+#include <engine2/isource2server.h>
+#include <engine2/ivengineserver2.h>
+#include <engine2/inetworkserverservice.h>
 #include "khook.hpp"
 #include "utils/module.h"
 #include <iostream>
@@ -48,13 +50,13 @@ IVEngineServer *engine = NULL;
 IGameEventManager2 *gameevents = NULL;
 ICvar *icvar = NULL;
 
-typedef int (*LogDirect_t)(void* loggingSystem, int channel, int severity, LeafCodeInfo_t*, char const*, va_list*);
+typedef int (*LogDirect_t)(void* loggingSystem, int channel, int severity, LoggingRareOptions_t*, char const*, va_list*);
 
 std::vector<re2::RE2*> g_RegexList;
 std::shared_mutex g_RegexMutex;
 thread_local bool g_BypassFilter = false;
 
-KHook::Return<int> Detour_LogDirect(void* loggingSystem, int channel, int severity, LeafCodeInfo_t* leafCode, char const* str, va_list* args)
+KHook::Return<int> Detour_LogDirect(void* loggingSystem, int channel, int severity, LoggingRareOptions_t* leafCode, char const* str, va_list* args)
 {
 	if (g_BypassFilter)
 		return {KHook::Action::Ignore};
@@ -81,7 +83,7 @@ KHook::Return<int> Detour_LogDirect(void* loggingSystem, int channel, int severi
 	return {KHook::Action::Ignore};
 }
 
-KHook::Function<int, void*, int, int, LeafCodeInfo_t*, char const*, va_list*> logDirectHook(Detour_LogDirect, nullptr);
+KHook::Function<int, void*, int, int, LoggingRareOptions_t*, char const*, va_list*> logDirectHook(Detour_LogDirect, nullptr);
 
 bool SetupHook()
 {
