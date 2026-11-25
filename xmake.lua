@@ -46,12 +46,9 @@ target("CleanerCS2-Xmake")
         SDK_PATH.."/thirdparty/protobuf-3.21.8/src",
         SDK_PATH.."/common",
         SDK_PATH.."/game/shared",
-        SDK_PATH.."/game/server",
         SDK_PATH.."/public",
-        SDK_PATH.."/public/engine",
         SDK_PATH.."/public/mathlib",
         SDK_PATH.."/public/tier0",
-        SDK_PATH.."/public/tier1",
         SDK_PATH.."/public/entity2",
         -- metamod
         MM_PATH.."/core",

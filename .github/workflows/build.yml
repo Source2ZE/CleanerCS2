@@ -38,7 +38,7 @@ jobs:
           path: mmsource-2.0
           submodules: recursive
 
-      - name: Checkout HL2SDK
+      - name: Checkout s2sdk
         uses: actions/checkout@v7
         with:
           repository: alliedmodders/s2sdk
